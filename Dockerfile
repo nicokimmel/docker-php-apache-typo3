@@ -9,6 +9,7 @@ RUN set -eux; \
 RUN apt-get update && apt-get install -y --no-install-recommends \
         git \
         unzip \
+        curl \
         libicu-dev \
         libzip-dev \
         zlib1g-dev \
@@ -30,7 +31,23 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && a2enmod rewrite headers expires deflate filter setenvif \
     && rm -rf /var/lib/apt/lists/*
 
-ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
+RUN set -eux; \
+    cat > /etc/apache2/sites-available/000-default.conf <<'EOF'
+<VirtualHost *:80>
+    ServerAdmin webmaster@localhost
+    DocumentRoot /var/www/html/public
+
+    <Directory /var/www/html/public>
+        Options FollowSymLinks
+        AllowOverride All
+        Require all granted
+        DirectoryIndex index.php index.html
+    </Directory>
+
+    ErrorLog ${APACHE_LOG_DIR}/error.log
+    CustomLog ${APACHE_LOG_DIR}/access.log combined
+</VirtualHost>
+EOF
 
 RUN { \
         echo "memory_limit=256M"; \
