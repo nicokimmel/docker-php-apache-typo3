@@ -32,6 +32,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 RUN set -eux; \
+    groupmod -o -g 1000 www-data; \
+    usermod  -o -u 1000 -g 1000 www-data; \
+    sed -ri 's/^export APACHE_RUN_USER=.*/export APACHE_RUN_USER=www-data/' /etc/apache2/envvars; \
+    sed -ri 's/^export APACHE_RUN_GROUP=.*/export APACHE_RUN_GROUP=www-data/' /etc/apache2/envvars
+
+RUN set -eux; \
     cat > /etc/apache2/sites-available/000-default.conf <<'EOF'
 <VirtualHost *:80>
     ServerAdmin webmaster@localhost
