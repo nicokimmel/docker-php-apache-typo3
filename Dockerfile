@@ -1,4 +1,4 @@
-FROM php:7.2-apache
+FROM php:7.4-apache
 
 RUN set -eux; \
     sed -i 's|http://deb.debian.org/debian|http://archive.debian.org/debian|g' /etc/apt/sources.list; \
