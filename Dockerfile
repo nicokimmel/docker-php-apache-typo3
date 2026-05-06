@@ -30,6 +30,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && a2enmod rewrite headers expires deflate filter setenvif \
     && rm -rf /var/lib/apt/lists/*
 
+ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
+
 RUN { \
         echo "memory_limit=256M"; \
         echo "max_execution_time=240"; \
