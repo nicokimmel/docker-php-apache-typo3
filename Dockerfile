@@ -1,11 +1,9 @@
-FROM php:7.4-apache-bullseye
+FROM php:7.2-apache-buster
 
 RUN set -eux; \
-    printf '%s\n' \
-      'deb http://archive.debian.org/debian bullseye main' \
-      'deb http://archive.debian.org/debian bullseye-updates main' \
-      'deb http://security.debian.org/debian-security bullseye-security main' \
-      > /etc/apt/sources.list; \
+    sed -i 's|http://deb.debian.org/debian|http://archive.debian.org/debian|g' /etc/apt/sources.list; \
+    sed -i 's|http://security.debian.org/debian-security|http://archive.debian.org/debian-security|g' /etc/apt/sources.list; \
+    sed -i '/buster-updates/d' /etc/apt/sources.list; \
     echo 'Acquire::Check-Valid-Until "false";' > /etc/apt/apt.conf.d/99no-check-valid-until
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -18,10 +16,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         libpng-dev \
         libjpeg-dev \
         libfreetype6-dev \
-        libonig-dev \
     && docker-php-ext-configure gd \
-        --with-freetype \
-        --with-jpeg \
+        --with-gd \
+        --with-jpeg-dir=/usr/include/ \
+        --with-freetype-dir=/usr/include/ \
     && docker-php-ext-install -j"$(nproc)" \
         intl \
         mbstring \
